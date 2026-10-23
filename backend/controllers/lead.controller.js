@@ -1,6 +1,8 @@
 import { Lead } from "../models/Lead.js";
+import { Activity } from "../models/Activity.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
+import { ensureCompanies } from "./company.controller.js";
 
 export const getLeads = asyncHandler(async (req, res) => {
   const { status, priority, source, search } = req.query;
@@ -26,6 +28,7 @@ export const getLead = asyncHandler(async (req, res) => {
 
 export const createLead = asyncHandler(async (req, res) => {
   const lead = await Lead.create({ ...req.body, owner: req.user._id });
+  await ensureCompanies(req.user._id, [lead.company]);
   res.status(201).json({ success: true, lead });
 });
 
@@ -38,12 +41,14 @@ export const updateLead = asyncHandler(async (req, res) => {
     { new: true, runValidators: true }
   );
   if (!lead) throw new ApiError(404, "Lead not found");
+  await ensureCompanies(req.user._id, [lead.company]);
   res.json({ success: true, lead });
 });
 
 export const deleteLead = asyncHandler(async (req, res) => {
   const lead = await Lead.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
   if (!lead) throw new ApiError(404, "Lead not found");
+  await Activity.deleteMany({ owner: req.user._id, lead: lead._id });
   res.json({ success: true, message: "Lead deleted" });
 });
 

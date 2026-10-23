@@ -18,7 +18,9 @@ const LINKS = [
   { to: "/leads", label: "Leads" },
   { to: "/pipeline", label: "Pipeline" },
   { to: "/contacts", label: "Contacts" },
-  { to: "/tasks", label: "Follow-ups" },
+  { to: "/companies", label: "Companies" },
+  { to: "/follow-ups", label: "Follow-ups" },
+  { to: "/tasks", label: "Tasks" },
 ];
 
 export function TopNav({ onMenuClick }) {
@@ -33,7 +35,7 @@ export function TopNav({ onMenuClick }) {
           <Sparkles className="h-5 w-5" />
         </div>
         <span className="hidden font-display text-lg font-bold text-ink sm:block">
-          TTP CRM
+          Xeno CRM
         </span>
       </div>
 

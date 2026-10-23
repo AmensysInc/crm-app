@@ -27,6 +27,14 @@ export const contactsApi = {
   remove: (id) => api.delete(`/contacts/${id}`),
 };
 
+export const companiesApi = {
+  list: (params) => api.get("/companies", { params }),
+  get: (id) => api.get(`/companies/${id}`),
+  create: (data) => api.post("/companies", data),
+  update: (id, data) => api.put(`/companies/${id}`, data),
+  remove: (id) => api.delete(`/companies/${id}`),
+};
+
 export const notesApi = {
   list: (params) => api.get("/notes", { params }),
   create: (data) => api.post("/notes", data),
@@ -39,6 +47,13 @@ export const tasksApi = {
   create: (data) => api.post("/tasks", data),
   update: (id, data) => api.put(`/tasks/${id}`, data),
   remove: (id) => api.delete(`/tasks/${id}`),
+};
+
+export const activitiesApi = {
+  list: (params) => api.get("/activities", { params }),
+  create: (data) => api.post("/activities", data),
+  update: (id, data) => api.put(`/activities/${id}`, data),
+  remove: (id) => api.delete(`/activities/${id}`),
 };
 
 export const aiApi = {

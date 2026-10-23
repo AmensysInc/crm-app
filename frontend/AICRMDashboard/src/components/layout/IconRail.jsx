@@ -3,9 +3,11 @@ import {
   LayoutGrid,
   Users,
   Contact2,
+  Building2,
   KanbanSquare,
   StickyNote,
   CalendarCheck,
+  CalendarClock,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -19,9 +21,11 @@ const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutGrid, end: true },
   { to: "/leads", label: "Leads", icon: Users },
   { to: "/contacts", label: "Contacts", icon: Contact2 },
+  { to: "/companies", label: "Companies", icon: Building2 },
   { to: "/pipeline", label: "Pipeline", icon: KanbanSquare },
   { to: "/notes", label: "Notes", icon: StickyNote },
-  { to: "/tasks", label: "Follow-ups", icon: CalendarCheck },
+  { to: "/follow-ups", label: "Follow-ups", icon: CalendarClock },
+  { to: "/tasks", label: "Tasks", icon: CalendarCheck },
 ];
 
 function RailLink({ to, label, icon: Icon, end }) {

@@ -54,7 +54,7 @@ const generateText = async (prompt, temperature = 0.7) => {
 };
 
 export const generateLeadSummary = async (lead) => {
-  const prompt = `You are an expert B2B sales analyst for a CRM called TTP CRM.
+  const prompt = `You are an expert B2B sales analyst for a CRM called Xeno CRM.
 Analyse the following sales lead and produce a concise assessment.
 
 Lead details:
@@ -111,7 +111,7 @@ Recipient (lead) details:
 
 Return JSON only with a compelling subject line and a complete email body.
 Use line breaks (\\n) in the body. Keep it under 180 words. Sign off as ${
-    sender?.name || "the TTP CRM team"
+    sender?.name || "the Xeno CRM team"
   }.`;
 
   const schema = {

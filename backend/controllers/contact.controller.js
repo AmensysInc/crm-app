@@ -1,6 +1,7 @@
 import { Contact } from "../models/Contact.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
+import { ensureCompanies } from "./company.controller.js";
 
 export const getContacts = asyncHandler(async (req, res) => {
   const { search, tag } = req.query;
@@ -24,6 +25,7 @@ export const getContact = asyncHandler(async (req, res) => {
 
 export const createContact = asyncHandler(async (req, res) => {
   const contact = await Contact.create({ ...req.body, owner: req.user._id });
+  await ensureCompanies(req.user._id, [contact.company]);
   res.status(201).json({ success: true, contact });
 });
 
@@ -35,6 +37,7 @@ export const updateContact = asyncHandler(async (req, res) => {
     { new: true, runValidators: true }
   );
   if (!contact) throw new ApiError(404, "Contact not found");
+  await ensureCompanies(req.user._id, [contact.company]);
   res.json({ success: true, contact });
 });
 

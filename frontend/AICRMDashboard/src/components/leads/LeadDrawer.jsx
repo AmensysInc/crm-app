@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Mail,
   Phone,
@@ -8,8 +9,9 @@ import {
   Trash2,
   Wand2,
   AlertCircle,
+  History,
 } from "lucide-react";
-import { Drawer, Button, Badge, Avatar, Spinner } from "../ui";
+import { Drawer, Button, buttonVariants, Badge, Avatar, Spinner } from "../ui";
 import { AiEmailDialog } from "../ai/AiEmailDialog";
 import { aiApi } from "../../lib/services";
 import { currency, shortDate } from "../../lib/format";
@@ -131,6 +133,12 @@ export function LeadDrawer({ open, onClose, lead, onEdit, onDelete }) {
 
         {/* Actions */}
         <div className="mt-5 grid grid-cols-2 gap-2">
+          <Link
+            to={`/leads/${lead._id}`}
+            className={cn(buttonVariants({ variant: "primary" }), "col-span-2")}
+          >
+            <History className="h-4 w-4" /> Activity &amp; follow-ups
+          </Link>
           <Button variant="outline" onClick={() => setEmailOpen(true)} className="col-span-2">
             <Wand2 className="h-4 w-4" /> Generate AI email
           </Button>
