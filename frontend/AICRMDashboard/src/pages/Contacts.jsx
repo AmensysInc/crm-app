@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -36,6 +37,7 @@ import {
   DropdownItem,
   Spinner,
 } from "../components/ui";
+import { CompanySelect } from "../components/companies/CompanySelect";
 import { contactsApi } from "../lib/services";
 import { relative, shortDate } from "../lib/format";
 import { cn } from "../lib/utils";
@@ -106,6 +108,14 @@ export default function Contacts() {
   const [deleting, setDeleting] = useState(false);
   const [favLoading, setFavLoading] = useState({}); // { [id]: bool }
 
+  // Company filter lives in the URL so the Companies page can link here.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const companyFilter = searchParams.get("company") || "";
+  const setCompanyFilter = (name) => {
+    setSelected(null);
+    setSearchParams(name ? { company: name } : {});
+  };
+
   // Fetch all contacts and store them
   const load = () => {
     setContacts(null);
@@ -150,6 +160,7 @@ export default function Contacts() {
   const filtered = useMemo(() => {
     if (!contacts) return [];
     return contacts.filter((c) => {
+      if (companyFilter && c.company !== companyFilter) return false;
       if (filters.tag && !(c.tags || []).includes(filters.tag)) return false;
       if (filters.search) {
         const q = filters.search.toLowerCase();
@@ -161,7 +172,7 @@ export default function Contacts() {
       }
       return true;
     });
-  }, [contacts, filters]);
+  }, [contacts, filters, companyFilter]);
 
   // Favorites float to the top; everything else keeps its relative order
   // (Array.prototype.sort is stable).
@@ -170,7 +181,7 @@ export default function Contacts() {
     [filtered]
   );
 
-  const filtersActive = filters.search || filters.tag;
+  const filtersActive = filters.search || filters.tag || companyFilter;
 
   // FLIP refs — animate cards/rows sliding to their new position on reorder.
   const gridRef = useFlip(ordered);
@@ -307,11 +318,29 @@ export default function Contacts() {
             />
           ))}
 
+          {/* Active company filter */}
+          {companyFilter && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-50 py-1 pl-3 pr-1.5 text-sm font-medium text-sky-700">
+              <Building2 className="h-3.5 w-3.5" />
+              {companyFilter}
+              <button
+                onClick={() => setCompanyFilter("")}
+                aria-label="Remove company filter"
+                className="rounded-full p-0.5 transition hover:bg-sky-100"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </span>
+          )}
+
           {/* Right-aligned controls */}
           <div className="ml-auto flex items-center gap-3">
             {filtersActive && (
               <button
-                onClick={() => setFilters({ search: "", tag: "" })}
+                onClick={() => {
+                  setFilters({ search: "", tag: "" });
+                  setCompanyFilter("");
+                }}
                 className="inline-flex items-center gap-1 text-sm font-medium text-ink-soft transition hover:text-ink"
               >
                 <X className="h-3.5 w-3.5" /> Clear
@@ -337,7 +366,7 @@ export default function Contacts() {
           title={filtersActive ? "No contacts match" : "No contacts yet"}
           description={
             filtersActive
-              ? "Try different search terms or clear the tag filter."
+              ? "Try different search terms or clear the filters."
               : "Add your first contact to start building your network."
           }
           action={
@@ -361,6 +390,7 @@ export default function Contacts() {
               onOpen={() => setSelected(contact)}
               onEdit={() => openEdit(contact)}
               onDelete={() => setToDelete(contact)}
+              onCompanyClick={setCompanyFilter}
             />
           ))}
         </div>
@@ -390,6 +420,7 @@ export default function Contacts() {
                     onOpen={() => setSelected(contact)}
                     onEdit={() => openEdit(contact)}
                     onDelete={() => setToDelete(contact)}
+                    onCompanyClick={setCompanyFilter}
                   />
                 ))}
               </tbody>
@@ -405,12 +436,14 @@ export default function Contacts() {
         onClose={() => setSelected(null)}
         onEdit={() => openEdit(selected)}
         onDelete={() => setToDelete(selected)}
+        onCompanyClick={setCompanyFilter}
       />
 
       {/* ── Add / Edit Dialog ── */}
       <ContactFormDialog
         open={formOpen}
         contact={editing}
+        defaultCompany={companyFilter}
         onClose={() => setFormOpen(false)}
         onSaved={handleSaved}
       />
@@ -514,6 +547,7 @@ function ViewToggle({ view, onChange }) {
 /* ─── ContactCard ────────────────────────────────────────────────────────────
    Single premium contact tile for the card grid view.
    Shows avatar, name, title/company, favorite toggle, tags, email/phone.
+   The company name filters the page to that company's contacts.
    ──────────────────────────────────────────────────────────────────────────── */
 function ContactCard({
   contact,
@@ -523,6 +557,7 @@ function ContactCard({
   onOpen,
   onEdit,
   onDelete,
+  onCompanyClick,
 }) {
   return (
     <div
@@ -573,10 +608,11 @@ function ContactCard({
           <p className="font-semibold text-ink leading-tight truncate">
             {contact.name}
           </p>
-          {(contact.title || contact.company) && (
-            <p className="mt-0.5 text-sm text-ink-soft truncate">
-              {[contact.title, contact.company].filter(Boolean).join(" · ")}
-            </p>
+          {contact.title && (
+            <p className="mt-0.5 text-sm text-ink-soft truncate">{contact.title}</p>
+          )}
+          {contact.company && (
+            <CompanyLink name={contact.company} onClick={onCompanyClick} className="mt-1" />
           )}
         </div>
       </div>
@@ -630,6 +666,7 @@ function ContactTableRow({
   onOpen,
   onEdit,
   onDelete,
+  onCompanyClick,
 }) {
   return (
     <tr
@@ -643,9 +680,11 @@ function ContactTableRow({
           <Avatar name={contact.name} size="sm" />
           <div>
             <p className="font-medium text-ink">{contact.name}</p>
-            <p className="text-xs text-ink-soft">
-              {contact.company || contact.email || "—"}
-            </p>
+            {contact.company ? (
+              <CompanyLink name={contact.company} onClick={onCompanyClick} size="xs" />
+            ) : (
+              <p className="text-xs text-ink-soft">{contact.email || "—"}</p>
+            )}
           </div>
         </div>
       </td>
@@ -737,7 +776,7 @@ function ContactTableRow({
 /* ─── ContactDrawer ──────────────────────────────────────────────────────────
    Right slide-over detail panel for a single contact.
    ──────────────────────────────────────────────────────────────────────────── */
-function ContactDrawer({ open, contact, onClose, onEdit, onDelete }) {
+function ContactDrawer({ open, contact, onClose, onEdit, onDelete, onCompanyClick }) {
   if (!contact) return null;
 
   return (
@@ -753,10 +792,8 @@ function ContactDrawer({ open, contact, onClose, onEdit, onDelete }) {
                 <Star className="h-4 w-4 fill-amber-400 text-amber-400 shrink-0" />
               )}
             </div>
-            {(contact.title || contact.company) && (
-              <p className="text-sm text-ink-soft mt-0.5">
-                {[contact.title, contact.company].filter(Boolean).join(" · ")}
-              </p>
+            {contact.title && (
+              <p className="text-sm text-ink-soft mt-0.5">{contact.title}</p>
             )}
             {contact.favorite && (
               <Badge className="mt-1.5 bg-amber-50 text-amber-700 text-[11px]">
@@ -792,7 +829,21 @@ function ContactDrawer({ open, contact, onClose, onEdit, onDelete }) {
           )}
           {contact.company && (
             <DrawerRow icon={<Building2 className="h-4 w-4" />} label="Company">
-              <span className="text-ink">{contact.company}</span>
+              <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="font-medium text-ink">{contact.company}</span>
+                <button
+                  onClick={() => onCompanyClick(contact.company)}
+                  className="text-xs font-medium text-brand-700 hover:underline"
+                >
+                  All contacts here
+                </button>
+                <Link
+                  to={`/companies?search=${encodeURIComponent(contact.company)}`}
+                  className="text-xs font-medium text-brand-700 hover:underline"
+                >
+                  View company
+                </Link>
+              </span>
             </DrawerRow>
           )}
         </div>
@@ -845,6 +896,27 @@ function ContactDrawer({ open, contact, onClose, onEdit, onDelete }) {
   );
 }
 
+/* ── Company name as a link that filters the page to that company ── */
+function CompanyLink({ name, onClick, size = "sm", className }) {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick(name);
+      }}
+      title={`Show all contacts at ${name}`}
+      className={cn(
+        "inline-flex max-w-full items-center gap-1 font-medium text-sky-700 transition hover:text-sky-800 hover:underline",
+        size === "xs" ? "text-xs" : "text-sm",
+        className
+      )}
+    >
+      <Building2 className={cn("shrink-0", size === "xs" ? "h-3 w-3" : "h-3.5 w-3.5")} />
+      <span className="truncate">{name}</span>
+    </button>
+  );
+}
+
 /* ── Single row in the drawer info table ── */
 function DrawerRow({ icon, label, children }) {
   return (
@@ -860,11 +932,12 @@ function DrawerRow({ icon, label, children }) {
    Add / Edit dialog backed by react-hook-form.
    Tags are entered as a comma-separated string and split on submit.
    ──────────────────────────────────────────────────────────────────────────── */
-function ContactFormDialog({ open, contact, onClose, onSaved }) {
+function ContactFormDialog({ open, contact, defaultCompany, onClose, onSaved }) {
   const isEdit = Boolean(contact);
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -888,7 +961,8 @@ function ContactFormDialog({ open, contact, onClose, onSaved }) {
           : {
               name: "",
               title: "",
-              company: "",
+              // Pre-fill the company when adding from a filtered view.
+              company: defaultCompany || "",
               email: "",
               phone: "",
               tags: "",
@@ -897,7 +971,7 @@ function ContactFormDialog({ open, contact, onClose, onSaved }) {
             }
       );
     }
-  }, [open, contact, reset]);
+  }, [open, contact, defaultCompany, reset]);
 
   const onSubmit = async (values) => {
     // Parse comma-separated tags into a clean array
@@ -952,7 +1026,13 @@ function ContactFormDialog({ open, contact, onClose, onSaved }) {
             <Input {...register("title")} placeholder="Head of Design" />
           </Field>
           <Field label="Company">
-            <Input {...register("company")} placeholder="Acme Inc." />
+            <Controller
+              name="company"
+              control={control}
+              render={({ field }) => (
+                <CompanySelect value={field.value} onChange={field.onChange} />
+              )}
+            />
           </Field>
         </div>
 

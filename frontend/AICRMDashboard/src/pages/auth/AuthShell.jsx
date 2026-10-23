@@ -13,7 +13,7 @@ export function AuthShell({ children }) {
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15">
             <Sparkles className="h-5 w-5" />
           </div>
-          <span className="font-display text-lg font-bold">Time To Program CRM</span>
+          <span className="font-display text-lg font-bold">Xeno CRM</span>
         </div>
 
         <div className="relative">
@@ -21,7 +21,7 @@ export function AuthShell({ children }) {
             Close more deals with an AI co-pilot in your pipeline.
           </h2>
           <p className="mt-4 max-w-md text-white/70">
-            TTP CRM unifies your leads, contacts and follow-ups — then layers
+            Xeno CRM unifies your leads, contacts and follow-ups — then layers
             Gemini-powered summaries, email drafts and sales insights on top.
           </p>
 
@@ -42,7 +42,7 @@ export function AuthShell({ children }) {
         </div>
 
         <p className="relative text-xs text-white/50">
-          © {new Date().getFullYear()} Time To Program. All rights reserved.
+          © {new Date().getFullYear()} Xeno CRM. All rights reserved.
         </p>
       </div>
 

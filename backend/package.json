@@ -1,7 +1,7 @@
 {
-  "name": "ttp-crm-backend",
+  "name": "xeno-crm-backend",
   "version": "1.0.0",
-  "description": "Time To Program CRM — AI-powered SaaS CRM backend (Express + MongoDB + Gemini)",
+  "description": "Xeno CRM — AI-powered SaaS CRM backend (Express + MongoDB + Gemini)",
   "main": "server.js",
   "type": "module",
   "scripts": {

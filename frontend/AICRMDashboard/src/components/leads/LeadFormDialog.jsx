@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Dialog, Button, Field, Input, Select, Textarea } from "../ui";
+import { CompanySelect } from "../companies/CompanySelect";
 import { leadsApi } from "../../lib/services";
 import { LEAD_STAGES, LEAD_PRIORITIES, LEAD_SOURCES } from "../../lib/constants";
 
@@ -13,6 +14,7 @@ export function LeadFormDialog({ open, onClose, lead, onSaved }) {
   const editing = Boolean(lead?._id);
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -64,7 +66,13 @@ export function LeadFormDialog({ open, onClose, lead, onSaved }) {
             />
           </Field>
           <Field label="Company">
-            <Input placeholder="Company" {...register("company")} />
+            <Controller
+              name="company"
+              control={control}
+              render={({ field }) => (
+                <CompanySelect value={field.value} onChange={field.onChange} />
+              )}
+            />
           </Field>
           <Field label="Email">
             <Input type="email" placeholder="email@company.com" {...register("email")} />

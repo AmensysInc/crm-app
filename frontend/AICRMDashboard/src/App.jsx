@@ -6,10 +6,13 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
 import Leads from "./pages/Leads";
+import LeadDetails from "./pages/LeadDetails";
 import Contacts from "./pages/Contacts";
+import Companies from "./pages/Companies";
 import Pipeline from "./pages/Pipeline";
 import Notes from "./pages/Notes";
 import Tasks from "./pages/Tasks";
+import FollowUps from "./pages/FollowUps";
 import Settings from "./pages/Settings";
 
 /* Central route table. Auth routes are public; everything else is wrapped in
@@ -31,9 +34,12 @@ export default function App() {
       >
         <Route path="/" element={<Dashboard />} />
         <Route path="/leads" element={<Leads />} />
+        <Route path="/leads/:id" element={<LeadDetails />} />
         <Route path="/contacts" element={<Contacts />} />
+        <Route path="/companies" element={<Companies />} />
         <Route path="/pipeline" element={<Pipeline />} />
         <Route path="/notes" element={<Notes />} />
+        <Route path="/follow-ups" element={<FollowUps />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/settings" element={<Settings />} />
       </Route>

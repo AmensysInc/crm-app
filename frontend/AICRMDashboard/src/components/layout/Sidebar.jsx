@@ -3,9 +3,11 @@ import {
   LayoutGrid,
   Users,
   Contact2,
+  Building2,
   KanbanSquare,
   StickyNote,
   CalendarCheck,
+  CalendarClock,
   Settings,
   LogOut,
   Sparkles,
@@ -18,9 +20,11 @@ const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutGrid, end: true },
   { to: "/leads", label: "Leads", icon: Users },
   { to: "/contacts", label: "Contacts", icon: Contact2 },
+  { to: "/companies", label: "Companies", icon: Building2 },
   { to: "/pipeline", label: "Pipeline", icon: KanbanSquare },
   { to: "/notes", label: "Notes", icon: StickyNote },
-  { to: "/tasks", label: "Follow-ups", icon: CalendarCheck },
+  { to: "/follow-ups", label: "Follow-ups", icon: CalendarClock },
+  { to: "/tasks", label: "Tasks", icon: CalendarCheck },
 ];
 
 export function Sidebar({ onNavigate }) {
@@ -33,7 +37,7 @@ export function Sidebar({ onNavigate }) {
         <div className="brand-gradient flex h-9 w-9 items-center justify-center rounded-xl text-white">
           <Sparkles className="h-5 w-5" />
         </div>
-        <span className="font-display text-lg font-bold text-ink">TTP CRM</span>
+        <span className="font-display text-lg font-bold text-ink">Xeno CRM</span>
       </div>
 
       {/* Nav links */}
